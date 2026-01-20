@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
+import fs from 'fs';
+
 
 /**
  * Read environment variables from file.
@@ -11,6 +13,15 @@ import 'dotenv/config';
  */
 
 const authFile = path.join(__dirname, 'storage', 'auth.json');
+
+// Create auth file and directory if they don't exist
+const authDir = path.dirname(authFile);
+if (!fs.existsSync(authDir)) {
+  fs.mkdirSync(authDir, { recursive: true });
+}
+if (!fs.existsSync(authFile)) {
+  fs.writeFileSync(authFile, JSON.stringify({}), 'utf-8');
+}
 
 export default defineConfig({
   testDir: './e2e',
