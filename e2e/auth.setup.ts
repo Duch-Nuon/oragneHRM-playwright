@@ -1,8 +1,7 @@
 import { test as setup } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
-import path from 'path';
 
-const authFile = path.join(__dirname, 'storage', 'auth.json');
+const authFile = 'storage/auth.json';
 
 setup('authenticate', async ({ page }) => {
   const login = new LoginPage(page);
@@ -12,8 +11,6 @@ setup('authenticate', async ({ page }) => {
     process.env.ORANGEHRM_USER ?? 'Admin',
     process.env.ORANGEHRM_PASS ?? 'admin123'
   );
-
+  await page.waitForURL('/web/index.php/dashboard/index', { timeout: 60000 });
   await page.context().storageState({ path: authFile });
-  await page.close();
-
 });

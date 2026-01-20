@@ -12,7 +12,7 @@ import 'dotenv/config';
  * See https://playwright.dev/docs/test-configuration.
  */
 
-const authFile = path.join(__dirname, 'storage', 'auth.json');
+const authFile = 'storage/auth.json';
 
 // Create auth file and directory if they don't exist
 const authDir = path.dirname(authFile);

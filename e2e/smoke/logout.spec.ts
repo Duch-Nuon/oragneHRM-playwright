@@ -2,15 +2,16 @@ import { test, expect } from '@playwright/test';
 import 'dotenv/config';
 
 test.describe('Dashboard + Logout (Smoke)', () => {
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/web/index.php/dashboard/index', { waitUntil: 'networkidle' });
+  });
+
   test('dashboard loads', async ({ page }) => {
-    await page.goto('web/index.php/dashboard/index', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
   });
 
   test('logout works', async ({ page }) => {
-    // must navigate first (new page per test)
-    await page.goto('web/index.php/dashboard/index', { waitUntil: 'domcontentloaded' });
-
     await page.getByRole('banner').getByRole('img', { name: 'profile picture' }).click();
     await page.getByRole('menuitem', { name: 'Logout' }).click();
     await expect(page.getByRole('heading')).toContainText('Login');
