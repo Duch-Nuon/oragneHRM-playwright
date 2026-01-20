@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'path';
 
 /**
  * Read environment variables from file.
@@ -9,7 +10,7 @@ import 'dotenv/config';
  * See https://playwright.dev/docs/test-configuration.
  */
 
-const authFile = 'storage/auth.json';
+const authFile = path.join(__dirname, 'storage', 'auth.json');
 
 export default defineConfig({
   testDir: './e2e',

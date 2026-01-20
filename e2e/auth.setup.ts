@@ -1,7 +1,8 @@
 import { test as setup } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
+import path from 'path';
 
-const authFile = 'storage/auth.json';
+const authFile = path.join(__dirname, 'storage', 'auth.json');
 
 setup('authenticate', async ({ page }) => {
   const login = new LoginPage(page);
