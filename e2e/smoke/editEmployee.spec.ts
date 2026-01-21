@@ -42,7 +42,9 @@ test.describe('Edit Employee and Update (Smoke)', () => {
 
         await page.getByText('Male', { exact: true }).click();
 
-        await page.getByRole('button', { name: 'Save' }).click();
+        await expect(page.locator('form').filter({ hasText: 'Employee Full NameEmployee' }).getByRole('button')).toBeVisible();
+
+        await page.locator('form').filter({ hasText: 'Employee Full NameEmployee' }).getByRole('button').click();
 
         await expect(page.getByText('SuccessSuccessfully Updated×')).toBeVisible();
     });
