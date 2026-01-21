@@ -20,10 +20,11 @@ test('add employee works', async ({ page }) => {
         await expect(page.getByRole('link', { name: 'Add Employee' })).toBeVisible();
         await page.getByRole('listitem').filter({ hasText: 'Add Employee' }).click();
 
+        await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
         await page.getByRole('button', { name: 'Save' }).click();
-
-        await expect(page.locator('form')).toContainText('Required');
-        await expect(page.locator('form')).toContainText('Required');  
+ 
+        await expect(page.getByText('Required').first()).toBeVisible();
+        await expect(page.getByText('Required').nth(1)).toBeVisible();
 
         await page.getByRole('textbox', { name: 'First Name' }).fill(employees[i].firstName);
         await page.getByRole('textbox', { name: 'Middle Name' }).click();
@@ -48,7 +49,7 @@ test('search employee by Id', async ({ page }) => {
     await page.getByRole('textbox').nth(2).fill(emId);
     await page.getByRole('button', { name: 'Search' }).click();
     await expect(page.getByRole('table')).toContainText(emId);
-    
+
 });
 
 });

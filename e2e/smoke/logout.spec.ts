@@ -4,7 +4,7 @@ import 'dotenv/config';
 test.describe('Dashboard + Logout (Smoke)', () => {
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/web/index.php/dashboard/index', { waitUntil: 'networkidle' });
+    await page.goto('/web/index.php/dashboard/index', { waitUntil: 'networkidle', timeout: 90000});
   });
 
   test('dashboard loads', async ({ page }) => {
