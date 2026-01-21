@@ -9,7 +9,8 @@ test.describe('Edit Employee and Update (Smoke)', () => {
     });
 
    test('Personal Details', async ({page}) => {
-
+    
+        await page.waitForLoadState('domcontentloaded');
         const employee = getRandomEmployee();
 
         await expect(page.getByRole('button').filter({ hasText: /^$/ }).nth(3)).toBeVisible();

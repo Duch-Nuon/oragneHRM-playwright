@@ -18,7 +18,9 @@ test('add employee works', async ({ page }) => {
     for(let i = 0; i < employees.length; i++) {
 
         await expect(page.getByRole('link', { name: 'Add Employee' })).toBeVisible();
-        await page.getByRole('listitem').filter({ hasText: 'Add Employee' }).click();
+        await page.getByRole('link', { name: 'Add Employee' }).click();
+        
+        await page.waitForLoadState('load');
 
         await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
         await page.getByRole('button', { name: 'Save' }).click();
