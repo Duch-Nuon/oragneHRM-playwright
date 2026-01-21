@@ -5,7 +5,7 @@ export class LoginPage {
   constructor(private readonly page: Page) {}
 
   async goto() {
-    await this.page.goto(process.env.BASE_URL + "/web/index.php/auth/login", { waitUntil: 'domcontentloaded' });
+    await this.page.goto(process.env.BASE_URL + "/web/index.php/auth/login", { waitUntil: 'domcontentloaded', timeout: 60000});
   }
 
   async login(username: string, password: string) {
