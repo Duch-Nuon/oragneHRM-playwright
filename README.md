@@ -102,10 +102,4 @@ pnpm exec playwright install
 rm -rf storage/auth.json
 pnpm exec playwright test e2e/auth.setup.ts
 ```
-
-**Need debug info:**
-```bash
-DEBUG=pw:api pnpm test
-```
-
 See [Playwright docs](https://playwright.dev) for more.
