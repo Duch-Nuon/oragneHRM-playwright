@@ -23,9 +23,9 @@ test.describe('Edit Employee and Update (Smoke)', () => {
         const date = '1999-12-05';
 
         try {
-            await page.getByRole('textbox', { name: 'yyyy-mm-dd' }).first().fill(date, { timeout: 2000 });
+            await page.getByRole('textbox', { name: 'dd-mm-yyyy' }).first().fill(date, { timeout: 2000 });
         } catch {
-            await page.getByRole('textbox', { name: 'yyyy-dd-mm' }).first().fill(date, { timeout: 2000 });
+            await page.getByRole('textbox', { name: 'mm-dd-yyyy' }).first().fill(date, { timeout: 2000 });
         }
 
         await page.locator('.oxd-icon.bi-caret-down-fill.oxd-select-text--arrow').first().click();
@@ -35,9 +35,9 @@ test.describe('Edit Employee and Update (Smoke)', () => {
         await page.getByRole('option', { name: 'Single' }).click();
 
         try {
-            await page.getByRole('textbox', { name: 'yyyy-mm-dd' }).nth(1).fill('2023-09-22', { timeout: 2000 });
+            await page.getByRole('textbox', { name: 'dd-mm-yyyy' }).nth(1).fill('2023-09-22', { timeout: 2000 });
         } catch {
-            await page.getByRole('textbox', { name: 'yyyy-dd-mm' }).nth(1).fill('2023-09-22', { timeout: 2000 });
+            await page.getByRole('textbox', { name: 'mm-dd-yyyy' }).nth(1).fill('2023-09-22', { timeout: 2000 });
         }
 
         await page.getByText('Male', { exact: true }).click();
@@ -50,6 +50,7 @@ test.describe('Edit Employee and Update (Smoke)', () => {
     });
 
     test('Contact Details', async ({ page }) => {
+         const employee = getRandomEmployee();
         // Navigate to first employee edit button
         await page.getByRole('button').filter({ hasText: /^$/ }).nth(3).click();
 
@@ -86,10 +87,10 @@ test.describe('Edit Employee and Update (Smoke)', () => {
         await page.locator('div:nth-child(6) > .oxd-grid-3 > div:nth-child(3) > .oxd-input-group > div:nth-child(2) > .oxd-input').fill('555-9999');
 
         // Enter work email
-        await page.locator('div:nth-child(9) > .oxd-grid-3 > div > .oxd-input-group > div:nth-child(2) > .oxd-input').first().fill('employee@company.com');
+        await page.locator('div:nth-child(9) > .oxd-grid-3 > div > .oxd-input-group > div:nth-child(2) > .oxd-input').first().fill(employee.emailCompany);
 
         // Enter other email
-        await page.locator('div:nth-child(9) > .oxd-grid-3 > div:nth-child(2) > .oxd-input-group > div:nth-child(2) > .oxd-input').fill('employee@personal.com');
+        await page.locator('div:nth-child(9) > .oxd-grid-3 > div:nth-child(2) > .oxd-input-group > div:nth-child(2) > .oxd-input').fill(employee.emailPersonal);
 
         // Click on Country dropdown to select a country
         await page.locator('.oxd-icon.bi-caret-down-fill.oxd-select-text--arrow').click();

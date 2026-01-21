@@ -2,6 +2,8 @@ export interface Employee {
   firstName: string;
   middleName: string;
   lastName: string;
+  emailCompany: string;
+  emailPersonal: string;
 }
 
 // Generate random string
@@ -19,6 +21,8 @@ const generateRandomEmployee = (): Employee => ({
   firstName: generateRandomString(6).charAt(0).toUpperCase() + generateRandomString(5).toLowerCase(),
   middleName: generateRandomString(6).charAt(0).toUpperCase() + generateRandomString(5).toLowerCase(),
   lastName: generateRandomString(7).charAt(0).toUpperCase() + generateRandomString(6).toLowerCase(),
+  emailCompany: `${generateRandomString(5).toLowerCase()}@company.com`,
+  emailPersonal: `${generateRandomString(5).toLowerCase()}@personal.com`,
 });
 
 // Generate 3 random employees
