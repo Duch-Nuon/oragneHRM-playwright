@@ -7,7 +7,6 @@ test.describe('Add Employee (Smoke)', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/web/index.php/pim/viewEmployeeList', { waitUntil: 'networkidle', timeout: 90000 });
-    await page.getByRole('link', { name: 'PIM' }).click();
   });
 
     // For 3 employees
