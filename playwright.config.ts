@@ -50,15 +50,24 @@ export default defineConfig({
   },
   /* Configure projects for major browsers */
   projects: [
+    
     {
       name: 'setup',
+      grepInvert: /@otp/,   
       testMatch: /.*\.setup\.ts/,
     },
 
     {
       name: 'chromium',
       dependencies: ['setup'],
+      grepInvert: /@otp/,   
       use: { ...devices['Desktop Chrome'], storageState: authFile },
+    },
+
+    {
+      name: 'otp',
+      grep: /@otp/,
+      use: { ...devices['Desktop Chrome'] },
     },
 
     // {
