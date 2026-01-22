@@ -79,11 +79,8 @@ storage/
 ## Playwright Options
 
 ```bash
-pnpm exec playwright test e2e/smoke                  # Specific folder
-pnpm exec playwright test -g "add employee"         # Match pattern
-pnpm exec playwright test --workers=1               # Sequential
-pnpm exec playwright test --project=chromium        # One browser
-pnpm exec playwright test --headed --slow-mo=1000   # Slow motion
+pnpm exec playwright test --project=chromium
+pnpm exec playwright test --project=otp
 ```
 
 ## Troubleshooting
