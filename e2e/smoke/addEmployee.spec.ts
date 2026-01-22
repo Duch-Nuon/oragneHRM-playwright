@@ -31,7 +31,9 @@ test('add employee works', async ({ page }) => {
 
         const error = page.getByText('Attachment Size Exceeded');
 
-        const validated = await error.isVisible({ timeout: 2000 }).catch(() => false);
+        const validated = await error.waitFor({ state: 'visible', timeout: 5000 })
+                          .then(() => true)
+                          .catch(() => false);
 
         if (validated) {
           await clearUpload(page);
