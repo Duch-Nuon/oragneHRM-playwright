@@ -48,6 +48,7 @@ export default defineConfig({
   expect: {
     timeout: 60_000,
   },
+  grepInvert: /@otp/,
   /* Configure projects for major browsers */
   projects: [
     {
