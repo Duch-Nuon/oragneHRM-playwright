@@ -48,18 +48,26 @@ export default defineConfig({
   expect: {
     timeout: 60_000,
   },
-  grepInvert: /@otp/,
   /* Configure projects for major browsers */
   projects: [
+    
     {
       name: 'setup',
+      grepInvert: /@otp/,   
       testMatch: /.*\.setup\.ts/,
     },
 
     {
       name: 'chromium',
       dependencies: ['setup'],
+      grepInvert: /@otp/,   
       use: { ...devices['Desktop Chrome'], storageState: authFile },
+    },
+
+    {
+      name: 'otp',
+      grep: /@otp/,
+      use: { ...devices['Desktop Chrome'] },
     },
 
     // {

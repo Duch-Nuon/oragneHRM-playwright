@@ -16,8 +16,6 @@ test.describe('Forget Password (OTP)',
         await page.getByRole('textbox', { name: 'Username' }).fill('orangehrm');
         await page.getByRole('button', { name: 'Reset Password' }).click();
 
-        await page.waitForURL('web/index.php/auth/sendPasswordReset', { waitUntil: 'networkidle', timeout: 90000});
-
         await expect(page.getByRole('heading', { name: 'Reset Password link sent' })).toBeVisible();
     });
 

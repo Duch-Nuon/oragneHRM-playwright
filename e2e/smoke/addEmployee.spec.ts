@@ -23,7 +23,7 @@ test('add employee works', async ({ page }) => {
         await expect(page.getByRole('link', { name: 'Add Employee' })).toBeVisible();
         await page.getByRole('link', { name: 'Add Employee' }).click();
         
-        await page.waitForLoadState('load');
+        await page.waitForLoadState('domcontentloaded');
 
         await clearUpload(page);
         await upLoadFile(filePath_ValidateFail, page);
@@ -59,7 +59,7 @@ test('add employee works', async ({ page }) => {
         await expect(page.getByText('Employee Id already exists')).toBeVisible().then(async () => {
 
           await page.getByRole('textbox').nth(4).fill('');
-          const newEmId = (emId + Math.floor(Math.random() * 1000).toString() + 1);
+          const newEmId = (emId + Math.floor(Math.random() * 1000).toString() + 2);
           await page.getByRole('textbox').nth(4).fill(newEmId);
           await page.getByRole('button', { name: 'Save' }).click();
 
