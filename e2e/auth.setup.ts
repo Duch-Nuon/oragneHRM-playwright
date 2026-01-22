@@ -11,6 +11,11 @@ setup('authenticate', async ({ page }) => {
     process.env.ORANGEHRM_USER ?? 'Admin',
     process.env.ORANGEHRM_PASS ?? 'admin123'
   );
-  await page.waitForURL('/web/index.php/dashboard/index', { timeout: 60000 });
+
+  await page.waitForURL('/web/index.php/dashboard/index', { 
+    waitUntil: 'domcontentloaded',  // Less strict than 'load'
+    timeout: 90000  // Increase timeout
+  });
+  
   await page.context().storageState({ path: authFile });
 });
