@@ -1,6 +1,7 @@
 
 import { getRandomEmployees, getRandomEmployee } from '../../helpers/data';
 import { test, expect } from '@playwright/test';
+import path from 'path';
 
 test.describe('Add Employee (Smoke)', () => {
 
@@ -15,12 +16,27 @@ test.describe('Add Employee (Smoke)', () => {
 
 test('add employee works', async ({ page }) => {
 
+    const filePath_ValidateFail = path.resolve(__dirname, '../../public/images/upload_error_validate.png');
+    const filePath_ValidateSuccess = path.resolve(__dirname, '../../public/images/upload_success.png');
+
     for(let i = 0; i < employees.length; i++) {
 
         await expect(page.getByRole('link', { name: 'Add Employee' })).toBeVisible();
         await page.getByRole('link', { name: 'Add Employee' }).click();
         
         await page.waitForLoadState('load');
+
+        await clearUpload(page);
+        await upLoadFile(filePath_ValidateFail, page);
+
+        const error = page.getByText('Attachment Size Exceeded');
+
+        const validated = await error.isVisible({ timeout: 2000 }).catch(() => false);
+
+        if (validated) {
+          await clearUpload(page);
+          await upLoadFile(filePath_ValidateSuccess, page);
+        }
 
         await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
         await page.getByRole('button', { name: 'Save' }).click();
@@ -39,7 +55,16 @@ test('add employee works', async ({ page }) => {
         
         await page.getByRole('button', { name: 'Save' }).click();
 
-        await expect(page.getByText('SuccessSuccessfully Saved×')).toBeVisible();
+        await expect(page.getByText('Employee Id already exists')).toBeVisible().then(async () => {
+
+          await page.getByRole('textbox').nth(4).fill('');
+          const newEmId = (emId + Math.floor(Math.random() * 1000).toString() + 1);
+          await page.getByRole('textbox').nth(4).fill(newEmId);
+          await page.getByRole('button', { name: 'Save' }).click();
+
+        }).finally(async () => {
+           await expect(page.getByText('SuccessSuccessfully Saved×')).toBeVisible();
+        });
     }
   });
 
@@ -53,5 +78,22 @@ test('search employee by Id', async ({ page }) => {
     await expect(page.getByRole('table')).toContainText(emId);
 
 });
+
+  async function upLoadFile(path: string, page: any) {
+
+    const [fileChooser] = await Promise.all([
+          page.waitForEvent('filechooser'),
+          await page.getByRole('button').nth(4).click()
+        ]);
+
+    await fileChooser.setFiles(path);
+  }
+
+  async function clearUpload(page: any) {
+    const input = page.locator('input[type="file"]');
+    if (await input.count()) {
+      await input.setInputFiles([]); // ✅ reset upload
+    }
+  }
 
 });
