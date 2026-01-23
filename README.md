@@ -29,16 +29,16 @@ BASE_URL=https://opensource-demo.orangehrmlive.com
 pnpm test
 
 # Smoke tests only
-pnpm exec playwright test e2e/smoke
+pnpm test:smoke
 
 # Debug mode (step-by-step)
-pnpm exec playwright test --debug
+pnpm test:debug
 
 # See browser
-pnpm exec playwright test --headed
+pnpm test:headed
 
 # View report
-pnpm exec playwright show-report
+pnpm report
 ```
 
 ## Project Structure
@@ -47,8 +47,12 @@ pnpm exec playwright show-report
 e2e/
 ├── auth.setup.ts              # Login & save session
 └── smoke/
+    ├── addAdmin.spec.ts       # Add Admin and ESS users
     ├── addEmployee.spec.ts    # Add/search employee
+    ├── editEmployee.spec.ts   # Edit employee
     └── logout.spec.ts         # Logout & dashboard
+└── otp/
+    └── forgetPassword.spec.ts # Forget Password
 
 pages/
 └── LoginPage.ts               # Page Object for login
@@ -62,11 +66,21 @@ storage/
 
 ## Tests Included
 
-- **Dashboard** - Loads after login
-- **Logout** - Returns to login page
-- **Add Employee** - Create 3 random employees
-- **Search Employee** - Find by ID
+- **Login and Logout**: Authenticates a user and logs them out.
+- **Add Admin and ESS users**: Creates new users with Admin and ESS roles.
+- **Add and Search Employee**: Adds new employees and searches for them by ID.
+- **Edit Employee**: Edits personal and contact details of an employee.
+- **Forget Password**: Resets the password for a user.
 
+## Scripts
+
+- `pnpm test`: Run all tests.
+- `pnpm test:smoke`: Run smoke tests only.
+- `pnpm test:debug`: Run tests in debug mode.
+- `pnpm test:headed`: Run tests with browser visible.
+- `pnpm report`: View test report.
+- `pnpm exec playwright test --project=chromium`: Run tests in Chromium.
+- `pnpm exec playwright test --project=otp`: Run OTP tests.
 ## Tips
 
 - Tests run in parallel (faster)
@@ -75,13 +89,6 @@ storage/
 - Use `--headed` to debug
 - Use `--debug` for interactive debugging
 - Use `-g "pattern"` to run specific tests
-
-## Playwright Options
-
-```bash
-pnpm exec playwright test --project=chromium
-pnpm exec playwright test --project=otp
-```
 
 ## Troubleshooting
 
