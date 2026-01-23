@@ -9,6 +9,11 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    env:
+        BASE_URL: ${{ secrets.BASE_URL }}
+        ORANGEHRM_USER: ${{ secrets.ORANGEHRM_USER }}
+        ORANGEHRM_PASS: ${{ secrets.ORANGEHRM_PASS }}
+        
     steps:
       - uses: actions/checkout@v5
       
@@ -25,18 +30,11 @@ jobs:
       
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
-      - name: Debug BASE_URL
-        run: echo "BASE_URL=$BASE_URL"
-      
       - name: Run Playwright tests
         run: pnpm exec playwright test --project=chromium
-
+        
       - name: Run Playwright tests Reset Password
         run: pnpm exec playwright test --project=otp
-        env:
-          BASE_URL: ${{ secrets.BASE_URL }}
-          ORANGEHRM_USER: ${{ secrets.ORANGEHRM_USER }}
-          ORANGEHRM_PASS: ${{ secrets.ORANGEHRM_PASS }}
       
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
