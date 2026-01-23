@@ -6,6 +6,9 @@ const authFile = 'storage/auth.json';
 setup('authenticate', async ({ page }) => {
   const login = new LoginPage(page);
   
+  console.log('BASE_URL in CI:', process.env.BASE_URL);
+  if (!process.env.BASE_URL) throw new Error('BASE_URL missing');
+
   await login.goto();
   await login.login(
     process.env.ORANGEHRM_USER ?? 'Admin',
