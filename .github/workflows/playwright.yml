@@ -41,6 +41,23 @@ jobs:
         run: pnpm exec playwright install --with-deps
       - name: Run Playwright tests
         run: pnpm exec playwright test --project=chromium
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+      - name: Upload HTML report to Azure
+        shell: bash
+        run: |
+          REPORT_DIR='run-${{ github.run_id }}-${{ github.run_attempt }}'
+          azcopy cp --recursive "./playwright-report/*" "https://playwrightgithub.blob.core.windows.net/\$web/$REPORT_DIR"
+          echo "::notice title=HTML report url::https://playwrightgithub.z23.web.core.windows.net/${{ github.run_id }}-${{ github.run_attempt }}/index.html"
+        env:
+          AZCOPY_AUTO_LOGIN_TYPE: SPN
+          AZCOPY_SPA_APPLICATION_ID: '${{ secrets.AZCOPY_SPA_APPLICATION_ID }}'
+          AZCOPY_SPA_CLIENT_SECRET: '${{ secrets.AZCOPY_SPA_CLIENT_SECRET }}'
+          AZCOPY_TENANT_ID: '${{ secrets.AZCOPY_TENANT_ID }}'
         
       - name: Run Playwright tests Reset Password
         run: pnpm exec playwright test --project=otp
@@ -56,7 +73,7 @@ jobs:
         run: |
           REPORT_DIR='run-${{ github.run_id }}-${{ github.run_attempt }}'
           azcopy cp --recursive "./playwright-report/*" "https://playwrightgithub.blob.core.windows.net/\$web/$REPORT_DIR"
-          echo "::notice title=HTML report url::https://playwrightgithub.z23.web.core.windows.net/$REPORT_DIR/index.html"
+          echo "::notice title=HTML report url::https://playwrightgithub.z23.web.core.windows.net/${{ github.run_id }}-${{ github.run_attempt }}/index.html"
         env:
           AZCOPY_AUTO_LOGIN_TYPE: SPN
           AZCOPY_SPA_APPLICATION_ID: '${{ secrets.AZCOPY_SPA_APPLICATION_ID }}'
