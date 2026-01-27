@@ -24,7 +24,6 @@ if (!fs.existsSync(authFile)) {
 }
 
 export default defineConfig({
-  testDir: './e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -53,21 +52,21 @@ export default defineConfig({
     
     {
       name: 'setup',
-      grepInvert: /@otp/,   
       testMatch: /.*\.setup\.ts/,
     },
 
     {
       name: 'chromium',
       dependencies: ['setup'],
-      grepInvert: /@otp/,   
+      testDir: './e2e/smoke',
       use: { ...devices['Desktop Chrome'], storageState: authFile },
     },
 
     {
       name: 'otp',
-      grep: /@otp/,
+      testDir: './e2e/otp',
       use: { ...devices['Desktop Chrome'] },
+      dependencies: ['chromium'],
     },
 
     // {
