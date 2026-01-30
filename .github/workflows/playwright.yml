@@ -48,9 +48,13 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          SUMMARY=$(tail -n 20 test-summary.txt)
-          MESSAGE="Playwright Test Results:%0A$SUMMARY"
+          SUMMARY=$(tail -n 30 test-summary.txt)
+          # Add emojis for pass/fail/skipped
+          SUMMARY=$(echo "$SUMMARY" | sed 's/^  ✓/✅/g' | sed 's/^  ✗/❌/g' | sed 's/^  -/⚠️/g')
+          # Escape for MarkdownV2
+          ESCAPED_SUMMARY=$(printf '%s' "$SUMMARY" | sed -e 's/`/\\`/g' -e 's/\*/\\*/g' -e 's/_/\\_/g' -e 's/\[/\\[/g' -e 's/\]/\\]/g' -e 's/(/\\(/g' -e 's/)/\\)/g' -e 's/~/\\~/g' -e 's/>/\\>/g' -e 's/#/\\#/g' -e 's/\+/\\+/g' -e 's/-/\\-/g' -e 's/=/\\=/g' -e 's/|/\\|/g' -e 's/{/\\{/g' -e 's/}/\\}/g' -e 's/\./\\./g' -e 's/!/\\!/g')
+          MESSAGE="*Playwright Test Results:*\n\n\`\`\`\n$ESCAPED_SUMMARY\n\`\`\`"
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -d chat_id="${TELEGRAM_CHAT_ID}" \
-            -d text="$MESSAGE" \
-            -d parse_mode="Markdown"
+            --data-urlencode text="$MESSAGE" \
+            -d parse_mode="MarkdownV2"
