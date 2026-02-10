@@ -5,6 +5,10 @@ pipeline {
         args '--user root'
       } 
    }
+
+   triggers {
+      githubPush()
+   }
    
    environment {
       BASE_URL = credentials('BASE_URL')
