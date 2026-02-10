@@ -20,10 +20,8 @@ pipeline {
     stage('Install (pnpm)') {
       steps {
         sh '''
-          npm install -g pnpm
           node -v
-          pnpm -v
-          pnpm install --frozen-lockfile
+          npx pnpm install --frozen-lockfile
         '''
       }
     }
@@ -32,7 +30,7 @@ pipeline {
       steps {
         // In Playwright docker image this is usually already OK,
         // but keeping it matches your GitHub Actions.
-        sh 'pnpm exec playwright install --with-deps'
+        sh 'npx pnpm exec playwright install --with-deps'
       }
     }
 
@@ -46,7 +44,7 @@ pipeline {
         ]) {
           sh '''
             mkdir -p test-results
-            pnpm exec playwright test --reporter=list | tee test-summary.txt
+            npx pnpm exec playwright test --reporter=list | tee test-summary.txt
           '''
         }
       }
