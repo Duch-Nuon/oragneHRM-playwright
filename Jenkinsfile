@@ -1,10 +1,14 @@
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright:v1.58.2-noble' } }
+   agent { 
+      docker { 
+        image 'mcr.microsoft.com/playwright:v1.58.2-noble' 
+      } 
+    }
    stages {
-      stage('e2e-tests') {
+      stage('install playwright') {
          steps {
-            sh 'npm ci'
-            sh 'npx playwright test'
+            sh 'pnpm install --frozen-lockfile'
+            sh 'pnpm exec playwright install --with-deps'
          }
       }
    }
