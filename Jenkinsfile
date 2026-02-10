@@ -8,15 +8,6 @@ pipeline {
 
   environment {
     CI = 'true'
-    // If your tests need these envs during runtime, define them here:
-    BASE_URL       = credentials('BASE_URL')
-    ORANGEHRM_USER = credentials('ORANGEHRM_USER')
-    ORANGEHRM_PASS = credentials('ORANGEHRM_PASS')
-    BASE_MAIL_URL  = credentials('BASE_MAIL_URL')
-
-    // pnpm user-space path
-    PNPM_HOME = "${WORKSPACE}/.pnpm"
-    PATH = "${WORKSPACE}/.pnpm:${env.PATH}"
   }
 
   stages {
@@ -29,15 +20,9 @@ pipeline {
     stage('Install (pnpm)') {
       steps {
         sh '''
-          set -euo pipefail
-
+          corepack enable
           node -v
-
-          # Install pnpm into workspace (no /usr/bin, no sudo)
-          mkdir -p "$PNPM_HOME"
-          curl -fsSL https://get.pnpm.io/install.sh | env PNPM_HOME="$PNPM_HOME" SHELL=bash sh -
-
-          pnpm -v
+          pnpm -v || true
           pnpm install --frozen-lockfile
         '''
       }
@@ -45,38 +30,51 @@ pipeline {
 
     stage('Install Playwright Browsers') {
       steps {
-        sh '''
-          set -euo pipefail
-          pnpm exec playwright install --with-deps
-        '''
+        // In Playwright docker image this is usually already OK,
+        // but keeping it matches your GitHub Actions.
+        sh 'pnpm exec playwright install --with-deps'
       }
     }
 
     stage('Run Playwright tests (capture output)') {
       steps {
-        sh '''
-          set -euo pipefail
-          mkdir -p test-results
-          pnpm exec playwright test --reporter=list | tee test-summary.txt
-        '''
+        withCredentials([
+          string(credentialsId: 'BASE_URL', variable: 'BASE_URL'),
+          string(credentialsId: 'ORANGEHRM_USER', variable: 'ORANGEHRM_USER'),
+          string(credentialsId: 'ORANGEHRM_PASS', variable: 'ORANGEHRM_PASS'),
+          string(credentialsId: 'BASE_MAIL_URL', variable: 'BASE_MAIL_URL')
+        ]) {
+          sh '''
+            mkdir -p test-results
+            pnpm exec playwright test --reporter=list | tee test-summary.txt
+          '''
+        }
       }
     }
   }
 
   post {
     always {
+      // Archive artifacts for debugging
       archiveArtifacts artifacts: 'test-summary.txt,playwright-report/**,test-results/**', allowEmptyArchive: true
 
+      // Send Telegram summary (equivalent to your GitHub Actions step)
       withCredentials([
+        string(credentialsId: 'BASE_URL', variable: 'BASE_URL'),
+        string(credentialsId: 'ORANGEHRM_USER', variable: 'ORANGEHRM_USER'),
+        string(credentialsId: 'ORANGEHRM_PASS', variable: 'ORANGEHRM_PASS'),
+        string(credentialsId: 'BASE_MAIL_URL', variable: 'BASE_MAIL_URL'),
         string(credentialsId: 'TELEGRAM_BOT_TOKEN', variable: 'TELEGRAM_BOT_TOKEN'),
         string(credentialsId: 'TELEGRAM_CHAT_ID', variable: 'TELEGRAM_CHAT_ID')
       ]) {
         sh '''
-          set -euo pipefail
-
+          # Take last 30 lines like your workflow
           SUMMARY=$(tail -n 30 test-summary.txt || true)
+
+          # Add emojis
           SUMMARY=$(echo "$SUMMARY" | sed 's/^  ✓/✅/g' | sed 's/^  ✗/❌/g' | sed 's/^  -/⚠️/g')
 
+          # Escape for MarkdownV2 (same idea as your YAML)
           ESCAPED_SUMMARY=$(printf '%s' "$SUMMARY" | sed -e 's/`/\\\\`/g' -e 's/\\*/\\\\*/g' -e 's/_/\\\\_/g' -e 's/\\[/\\\\[/g' -e 's/\\]/\\\\]/g' -e 's/(/\\\\(/g' -e 's/)/\\\\)/g' -e 's/~/\\\\~/g' -e 's/>/\\\\>/g' -e 's/#/\\\\#/g' -e 's/\\+/\\\\+/g' -e 's/-/\\\\-/g' -e 's/=/\\\\=/g' -e 's/|/\\\\|/g' -e 's/{/\\\\{/g' -e 's/}/\\\\}/g' -e 's/\\./\\\\./g' -e 's/!/\\\\!/g')
 
           MESSAGE=$(printf "*Playwright Test Results:*\\n\\n\\`\\`\\`\\n%s\\n\\`\\`\\`" "$ESCAPED_SUMMARY")
