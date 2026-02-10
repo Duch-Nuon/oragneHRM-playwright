@@ -20,6 +20,7 @@ pipeline {
     stage('Install (pnpm)') {
       steps {
         sh '''
+          export npm_config_cache=$(pwd)/.npm-cache
           node -v
           npx pnpm install --frozen-lockfile
         '''
@@ -30,7 +31,10 @@ pipeline {
       steps {
         // In Playwright docker image this is usually already OK,
         // but keeping it matches your GitHub Actions.
-        sh 'npx pnpm exec playwright install --with-deps'
+        sh '''
+          export npm_config_cache=$(pwd)/.npm-cache
+          npx pnpm exec playwright install --with-deps
+        '''
       }
     }
 
@@ -43,6 +47,7 @@ pipeline {
           string(credentialsId: 'BASE_MAIL_URL', variable: 'BASE_MAIL_URL')
         ]) {
           sh '''
+            export npm_config_cache=$(pwd)/.npm-cache
             mkdir -p test-results
             npx pnpm exec playwright test --reporter=list | tee test-summary.txt
           '''
