@@ -55,27 +55,19 @@ pipeline {
     post {
         always {
             script {
-                def summary = sh(
-                    script: 'tail -n 30 test-summary.txt',
-                    returnStdout: true
-                ).trim()
-                
-                // Add emojis for pass/fail/skipped
-                summary = summary.replaceAll(/(?m)^  ✓/, '✅')
-                                .replaceAll(/(?m)^  ✗/, '❌')
-                                .replaceAll(/(?m)^  -/, '⚠️')
-                
-                // Escape for MarkdownV2
-                def escapedSummary = summary.replaceAll(/[`*_\[\]()~>#+=|{}.!-]/) { "\\\\" + it }
-                
-                def message = "*Playwright Test Results:*\\n\\n\`\`\`\\n${escapedSummary}\\n\`\`\`"
-                
-                sh """
-                    curl -s -X POST "https://api.telegram.org/bot\${TELEGRAM_BOT_TOKEN}/sendMessage" \\
-                        -d chat_id="\${TELEGRAM_CHAT_ID}" \\
-                        --data-urlencode text="${message}" \\
+                // Send test summary to Telegram
+                sh '''
+                    SUMMARY=$(tail -n 30 test-summary.txt)
+                    # Add emojis for pass/fail/skipped
+                    SUMMARY=$(echo "$SUMMARY" | sed 's/^  ✓/✅/g' | sed 's/^  ✗/❌/g' | sed 's/^  -/⚠️/g')
+                    # Escape for MarkdownV2
+                    ESCAPED_SUMMARY=$(printf '%s' "$SUMMARY" | sed -e 's/`/\\\\`/g' -e 's/\\*/\\\\*/g' -e 's/_/\\\\_/g' -e 's/\\[/\\\\[/g' -e 's/\\]/\\\\]/g' -e 's/(/\\\\(/g' -e 's/)/\\\\)/g' -e 's/~/\\\\~/g' -e 's/>/\\\\>/g' -e 's/#/\\\\#/g' -e 's/\\+/\\\\+/g' -e 's/-/\\\\-/g' -e 's/=/\\\\=/g' -e 's/|/\\\\|/g' -e 's/{/\\\\{/g' -e 's/}/\\\\}/g' -e 's/\\./\\\\./g' -e 's/!/\\\\!/g')
+                    MESSAGE=$(printf "*Playwright Test Results:*\\n\\n\\`\\`\\`\\n%s\\n\\`\\`\\`" "$ESCAPED_SUMMARY")
+                    curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \\
+                        -d chat_id="${TELEGRAM_CHAT_ID}" \\
+                        --data-urlencode text="$MESSAGE" \\
                         -d parse_mode="MarkdownV2"
-                """
+                '''
             }
         }
     }
