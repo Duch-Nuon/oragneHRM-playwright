@@ -8,7 +8,7 @@ pipeline {
       stage('install playwright') {
          steps {
             sh 'node --version'
-            sh 'npm install -g pnpm'
+            sh 'curl -fsSL https://get.pnpm.io/install.sh | sh -'
             sh 'pnpm install --frozen-lockfile'
             sh 'pnpm exec playwright install --with-deps'
          }
