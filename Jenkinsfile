@@ -19,7 +19,6 @@ pipeline {
       TELEGRAM_CHAT_ID = credentials('TELEGRAM_CHAT_ID')
    }
    
-   
    options {
       timeout(time: 60, unit: 'MINUTES')
    }
